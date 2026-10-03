@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Script Engine V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 40 40" fill="none" aria-label="Video Script Engine">
+      <rect x="3" y="7" width="34" height="26" rx="4" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M3 14h34M11 7l-4 7M21 7l-4 7M31 7l-4 7" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M17 20v9l8-4.5z" fill="var(--accent)"/>
+    </svg>
+    <div>
+      <strong>Video Script Engine</strong><span class="ver">V2</span>
+      <small>اسکریپت، پرامپت، نریشن و زیرنویس فارسی — روی سرور ابری</small>
+    </div>
+  </div>
+  <nav class="modes" id="modes">
+    <button type="button" data-mode="script" class="on">ساخت اسکریپت</button>
+    <button type="button" data-mode="subs">زیرنویس خودکار</button>
+  </nav>
+  <div class="topright">
+    <span class="status" id="status" title="وضعیت سرور ابری"><i></i><span>در حال اتصال…</span></span>
+    <button class="ghost" id="settingsBtn" type="button">تنظیمات هوش مصنوعی</button>
+  </div>
+</header>
+
+<main class="layout" id="mode-script">
+  <!-- INPUT -->
+  <section class="panel input" aria-label="ورودی">
+    <h2>ورودی</h2>
+    <label>عنوان
+      <input id="title" placeholder="مثلاً: ۳ اشتباه رایج پیانیست‌های مبتدی">
+    </label>
+    <label>توضیحات / محتوای خام
+      <textarea id="desc" rows="6" placeholder="هر چه درباره موضوع دارید اینجا بنویسید؛ موتور خودش پیام اصلی، فکت‌ها و زاویهٔ احساسی را استخراج می‌کند."></textarea>
+    </label>
+
+    <div class="grid2">
+      <label>مدت (ثانیه)
+        <select id="duration"></select>
+      </label>
+      <label>هدف
+        <select id="intent">
+          <option value="Smart">هوشمند (خود موتور تصمیم بگیرد)</option>
+          <option value="Educational">آموزشی</option>
+          <option value="Storytelling">داستانی</option>
+          <option value="Motivational">انگیزشی</option>
+          <option value="Marketing">تبلیغاتی / معرفی محصول</option>
+          <option value="Entertainment">سرگرمی / طنز</option>
+          <option value="News">خبری / توضیحی</option>
+        </select>
+      </label>
+    </div>
+
+    <fieldset class="styles">
+      <legend>سبک بصری</legend>
+      <div class="chips" id="styleChips"></div>
+    </fieldset>
+
+    <div class="grid2">
+      <label>پلتفرم
+        <select id="platform">
+          <option>YouTube Shorts</option>
+          <option>Instagram Reels</option>
+          <option>TikTok</option>
+        </select>
+      </label>
+      <label>مدل ویدیو (خروجی)
+        <select id="target"></select>
+      </label>
+    </div>
+
+    <details class="adv">
+      <summary>تنظیمات پیشرفته</summary>
+      <label>سرعت نریشن (کلمه در ثانیه)
+        <input id="wps" type="number" step="0.1" min="1.5" max="3.5" value="2.3">
+      </label>
+      <label class="check"><input type="checkbox" id="autoRepair" checked> اصلاح خودکار اگر کنترل کیفیت رد شد</label>
+    </details>
+
+    <div class="actions">
+      <button class="primary" id="runBtn" type="button">ساخت اسکریپت</button>
+      <button class="ghost" id="manualBtn" type="button">حالت دستی (کپی پرامپت)</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+  </section>
+
+  <!-- OUTPUT -->
+  <section class="panel output" aria-label="خروجی">
+    <div class="pipeline" id="pipeline">
+      <div data-step="analyze">تحلیل محتوا</div>
+      <div data-step="direct">کارگردان هوشمند</div>
+      <div data-step="scenes">صحنه‌ها و سبک</div>
+      <div data-step="qc">کنترل کیفیت</div>
+      <div data-step="adapt">آداپتور مدل</div>
+    </div>
+
+    <div id="empty" class="empty">
+      <svg viewBox="0 0 120 80" fill="none" aria-hidden="true"><rect x="6" y="10" width="108" height="60" rx="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6 6"/><path d="M52 30v20l18-10z" fill="currentColor" opacity=".35"/></svg>
+      <p>عنوان و توضیحات را وارد کنید و «ساخت اسکریپت» را بزنید.</p>
+      <p class="hint">خروجی: تحلیل، اسکریپت صحنه‌به‌صحنه، نریشن، Master Prompt، Shot Promptها برای مدل انتخابی، و گزارش کنترل کیفیت.</p>
+    </div>
+
+    <div id="manual" class="manual" hidden>
+      <h3>حالت دستی</h3>
+      <ol>
+        <li>این پرامپت را کپی کنید و در Google AI Studio / ChatGPT / Claude بدهید.</li>
+        <li>پاسخ JSON را کامل همین‌جا بچسبانید و «پردازش» را بزنید. کنترل کیفیت و آداپتور مدل روی آن اجرا می‌شوند.</li>
+      </ol>
+      <div class="codebox"><button class="copy" data-copy="manualPrompt" type="button">کپی</button><pre id="manualPrompt" dir="ltr"></pre></div>
+      <textarea id="manualJson" dir="ltr" rows="8" placeholder='{ "analysis": ..., "direction": ..., "master": ..., "scenes": [...] }'></textarea>
+      <div class="actions"><button class="primary" id="manualRun" type="button">پردازش پاسخ</button><button class="ghost" id="manualClose" type="button">بستن</button></div>
+    </div>
+
+    <div id="error" class="error" hidden></div>
+
+    <div id="result" hidden>
+      <div class="verdict" id="verdict"></div>
+      <nav class="tabs" role="tablist" id="tabs">
+        <button data-tab="script" class="on" type="button">اسکریپت</button>
+        <button data-tab="prompts" type="button">پرامپت‌ها</button>
+        <button data-tab="vo" type="button">فقط نریشن</button>
+        <button data-tab="voice" type="button">صدا، زیرنویس و ویدیو</button>
+        <button data-tab="qc" type="button">کنترل کیفیت</button>
+        <button data-tab="analysis" type="button">تحلیل و کارگردانی</button>
+        <button data-tab="all" type="button">همه در یک‌جا</button>
+      </nav>
+      <div class="tab" id="tab-script"></div>
+      <div class="tab" id="tab-prompts" hidden></div>
+      <div class="tab" id="tab-vo" hidden></div>
+      <div class="tab" id="tab-voice" hidden>
+        <p class="hint">نریشن فارسی با صدای رایگان Microsoft Edge روی سرور ساخته می‌شود و سرعتش خودکار با مدت ویدیو تنظیم می‌شود. زیرنویس کلمه‌به‌کلمه از همان صدا و با متن دقیق اسکریپت درمی‌آید.</p>
+        <div class="row">
+          <label>صدا<select id="voice"><option value="fa-IR-FaridNeural">فرید (مرد)</option><option value="fa-IR-DilaraNeural">دلارا (زن)</option></select></label>
+          <label>سبک زیرنویس<select id="subStyle1" class="substyle"></select></label>
+          <label>کلمه در هر خط<select id="maxw1" class="maxw"></select></label>
+          <label class="check"><input type="checkbox" id="autofit" checked> تنظیم خودکار سرعت با مدت</label>
+        </div>
+        <button class="primary" id="ttsBtn" type="button">ساخت نریشن و زیرنویس</button>
+        <div id="ttsOut"></div>
+      </div>
+      <div class="tab" id="tab-qc" hidden></div>
+      <div class="tab" id="tab-analysis" hidden></div>
+      <div class="tab" id="tab-all" hidden></div>
+      <div class="actions end">
+        <button class="ghost" id="dlMd" type="button">دانلود Markdown</button>
+        <button class="ghost" id="dlJson" type="button">دانلود JSON</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="layout single" id="mode-subs" hidden>
+  <section class="panel">
+    <h2>زیرنویس خودکار فارسی</h2>
+    <p class="hint">ویدیو یا فایل صوتی را آپلود کنید. تشخیص گفتار با Whisper روی سرور ابری انجام می‌شود و به سیستم شما فشاری نمی‌آید. اگر متن اسکریپت را دارید وارد کنید تا زیرنویس دقیقاً با همان متن اصلاح شود.</p>
+    <div class="grid2">
+      <label>فایل ویدیو یا صدا (حداکثر ۳۰۰ مگابایت)<input type="file" id="asrFile" accept="video/*,audio/*"></label>
+      <label>دقت تشخیص<select id="asrModel"><option value="turbo">دقیق (Whisper Turbo) — پیشنهادی</option><option value="small">سریع (Whisper Small)</option></select></label>
+    </div>
+    <label>متن اسکریپت برای اصلاح زیرنویس (اختیاری ولی بسیار مؤثر)<textarea id="asrScript" rows="4" placeholder="متن نریشن را اینجا بچسبانید. کلمه‌هایی که Whisper اشتباه شنیده با متن درست جایگزین می‌شوند و زمان‌بندی حفظ می‌شود."></textarea></label>
+    <div class="row">
+      <label>زبان<select id="asrLang"><option value="fa">فارسی</option><option value="en">انگلیسی</option><option value="">تشخیص خودکار</option></select></label>
+      <label>سبک زیرنویس<select id="subStyle2" class="substyle"></select></label>
+      <label>کلمه در هر خط<select id="maxw2" class="maxw"></select></label>
+    </div>
+    <button class="primary" id="asrBtn" type="button">ساخت زیرنویس</button>
+    <div id="asrOut"></div>
+  </section>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" class="dlg">
+    <h3>موتور هوش مصنوعی (مغز اسکریپت)</h3>
+    <label>ارائه‌دهنده
+      <select id="provider">
+        <option value="gemini">Google Gemini — کلید رایگان AI Studio (پیشنهادی)</option>
+        <option value="groq">Groq — کلید رایگان</option>
+        <option value="openrouter">OpenRouter — مدل‌های :free</option>
+        <option value="custom">سایر سرویس‌های سازگار با OpenAI</option>
+      </select>
+    </label>
+    <label id="keyWrap" hidden>کلید API
+      <input id="apiKey" type="password" dir="ltr" autocomplete="off" placeholder="AIza... / gsk_... / sk-or-...">
+    </label>
+    <label id="modelWrap" hidden>مدل
+      <input id="model" dir="ltr" placeholder="پیش‌فرض ارائه‌دهنده">
+    </label>
+    <label id="baseWrap" hidden>Base URL
+      <input id="baseUrl" dir="ltr" placeholder="https://api.example.com/v1">
+    </label>
+    <p class="hint">پیشنهاد: کلید رایگان Gemini را در یک دقیقه از aistudio.google.com/apikey بگیرید (بدون کارت بانکی). بدون کلید هم می‌توانید از «حالت دستی» استفاده کنید: پرامپت را در Gemini یا ChatGPT رایگان بچسبانید و جواب را برگردانید؛ بقیهٔ مراحل (کنترل کیفیت، پرامپت مدل‌ها، صدا، زیرنویس و ویدیو) روی سرور انجام می‌شود. کلید فقط در حافظهٔ همین صفحه می‌ماند و برای هر درخواست به سرور ما و از آنجا به ارائه‌دهنده می‌رود؛ جایی ذخیره نمی‌شود.</p>
+    <div class="actions"><button class="primary" value="ok">ذخیره</button></div>
+  </form>
+</dialog>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
